@@ -12,9 +12,7 @@ const createMusic = async (req, res) => {
       return res.status(400).json({ message: "Music file required" });
     }
 
-    const result = await uploadFile(
-      file.buffer.toString("base64")
-    );
+    const result = await uploadFile(file.buffer.toString("base64"));
 
     const music = await Music.create({
       title,
@@ -26,7 +24,6 @@ const createMusic = async (req, res) => {
       message: "Music Created Successfully",
       music,
     });
-
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error" });
@@ -48,14 +45,61 @@ const albumMusic = async (req, res) => {
       message: "Album Created Successfully",
       album,
     });
-
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error" });
   }
 };
 
+const getAllMusic = async (req, res) => {
+  try {
+    const musics = await Music.find().limit(20).populate(
+      "artist",
+      "username email createdAt updatedAt",
+    );
+    res.status(200).json({
+      message: "Music Fetched successfully",
+      musics,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getAllAlbum = async (req, res) => {
+  try {
+  const album = await Album.find()
+  .select("title artist")
+  .populate("artist", "username email createdAt updatedAt");
+
+    res.status(200).json({
+      message: "Album Fetched successfully",
+      album,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getAlbumMusic=async(req,res)=>{
+  const {id} =req.params;
+    try {
+     const albumMusic = await Album.findById(id).populate("artist", "username email createdAt updatedAt");
+      res.status(200).json({
+      message: "Album Music Fetched successfully",
+      albumMusic,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+}
 module.exports = {
   createMusic,
   albumMusic,
+  getAllMusic,
+  getAllAlbum,
+  getAlbumMusic,
 };

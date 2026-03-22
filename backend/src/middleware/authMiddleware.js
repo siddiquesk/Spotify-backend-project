@@ -24,4 +24,29 @@ const AuthArtist = (req, res, next) => {
   }
 };
 
-module.exports = AuthArtist;
+const AuthUser =async(req,res,next)=>{
+ const {token}=req.cookies;
+ if(!token){
+  return res.status(401).json({ message: "Unauthorized" });
+ }
+
+ try{
+  const decoded = Jwt.verify(token,process.env.JWT_SECRET);
+  if(decoded.role !=="user"){
+     return res.status(403).json({
+        message: "Please Must be Authenticated",
+      });
+  }
+   req.user = decoded; 
+    next();
+ }catch(err){
+   return res.status(401).json({ message: "Unauthorized" });
+ }
+}
+
+
+
+module.exports = {
+  AuthArtist,
+  AuthUser,
+};
